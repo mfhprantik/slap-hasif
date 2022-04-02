@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Slap Hasif</title>
+
+		<style type="text/css">
+			.speed {
+				margin-top: 100px;
+				text-align: center;
+				font-size: 64px;
+			}
+
+			.hand {
+				position: absolute;
+				left: 100px;
+				top: 400px;
+				height: 150px;
+				width: 150px;
+				background-image: url("hand.png");
+				background-repeat: no-repeat;
+				background-position: center;
+				z-index: 1;
+			}
+
+			.hand2 {
+				background-image: url("hand2.png") !important;
+			}
+
+			.face {
+				position: absolute;
+				right: 100px;
+				top: 400px;
+				height: 150px;
+				width: 150px;
+				background-image: url("hasif.png");
+				background-repeat: no-repeat;
+				background-position: center;
+				z-index: 0;
+			}
+
+			.slapped {
+				background-image: url("hasif-slapped.png") !important;
+			}
+		</style>
+	</head>
+	<body onload="loadMusic()">
+		<div class="arena">
+			<div class="speed" style="display: none"></div>
+			<div class="hand"></div>
+			<div class="face"></div>
+		</div>
+
+		<script
+			src="https://code.jquery.com/jquery-3.6.0.min.js"
+			integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+			crossorigin="anonymous"
+		></script>
+
+		<script type="text/javascript">
+			var mouseDown = false;
+			var start = null;
+			var distance = $(".face").offset().left - $(".hand").offset().left;
+
+			window.addEventListener("mousedown", function (e) {
+				if (e.target === $(".hand")[0]) {
+					mouseDown = true;
+					start = e.timeStamp;
+					$(".hand").addClass("hand2");
+				}
+			});
+
+			window.addEventListener("mouseup", function (e) {
+				if (mouseDown) {
+					$(".hand").css("left", "");
+					$(".hand").css("top", "");
+					mouseDown = false;
+					start = null;
+					$(".hand").removeClass("hand2");
+				}
+			});
+
+			window.addEventListener("mousemove", function (e) {
+				if (mouseDown) {
+					$(".hand").css("left", e.pageX - 50);
+					$(".hand").css("top", e.pageY - 50);
+
+					if (e.pageX >= Number($(".face").offset().left)) {
+						playSlapSound();
+
+						$(".speed").show();
+						$(".speed").text(
+							(
+								((distance /
+									Number((e.timeStamp - start) / 1000)) *
+									3600) /
+								3779528.0352161
+							).toFixed(3) + "kmph"
+						);
+						setTimeout(() => {
+							$(".speed").hide();
+						}, 2000);
+
+						$(".face").addClass("slapped");
+						setTimeout(function () {
+							$(".face").removeClass("slapped");
+						}, 2000);
+
+						$(window).trigger("mouseup");
+					}
+				}
+			});
+
+			var musicIds = [
+				"slap_str0",
+				"slap_str1",
+				"slap_str2",
+				"slap_str3",
+				"slap_str4",
+				"slap_str5",
+			];
+			var bgMusicInstance = null;
+			function loadMusic() {
+				musicIds.forEach((id, index) => {
+					createjs.Sound.registerSound(id + ".mp3", id);
+				});
+			}
+
+			function playSlapSound() {
+				var id = musicIds[Math.floor(Math.random() * musicIds.length)];
+				bgMusicInstance = createjs.Sound.play(id);
+				bgMusicInstance.volume = 0.5;
+			}
+		</script>
+	</body>
+</html>
