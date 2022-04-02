@@ -115,15 +115,9 @@
 				}
 			});
 
-			var musicIds = [
-				"slap_str0",
-				"slap_str1",
-				"slap_str2",
-				"slap_str3",
-				"slap_str4",
-				"slap_str5",
-			];
+			var musicIds = ["slap_str5"];
 			var bgMusicInstance = null;
+			var slappedRecently = false;
 			function loadMusic() {
 				musicIds.forEach((id, index) => {
 					createjs.Sound.registerSound(id + ".mp3", id);
@@ -131,9 +125,17 @@
 			}
 
 			function playSlapSound() {
-				var id = musicIds[Math.floor(Math.random() * musicIds.length)];
-				bgMusicInstance = createjs.Sound.play(id);
-				bgMusicInstance.volume = 0.5;
+				if (!slappedRecently) {
+					slappedRecently = true;
+					var id =
+						musicIds[Math.floor(Math.random() * musicIds.length)];
+					bgMusicInstance = createjs.Sound.play(id);
+					bgMusicInstance.volume = 0.5;
+
+					setTimeout(() => {
+						slappedRecently = false;
+					}, 2000);
+				}
 			}
 		</script>
 	</body>
